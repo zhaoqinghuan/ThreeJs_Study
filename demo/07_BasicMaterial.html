@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 基础材质</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script type="text/javascript">
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        var renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        var scene = new THREE.Scene();
+        
+        //  相机（camera）
+        var camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(25, 25, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        var light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 15, 5);
+        scene.add(light);
+
+        //  材质
+        //  THREE.MeshBasicMaterial(opt)
+        //    opt可以缺省，或者为包含各属性的值 常见的 opt 值如下
+        //    visible：是否可见，默认为true
+        //    side：渲染面片正面或是反面，默认为正面THREE.FrontSide，可设置为反面THREE.BackSide，或双面THREE.DoubleSide
+        //    wireframe：是否渲染线而非面，默认为false
+        //    color：十六进制RGB颜色，如红色表示为0xff0000
+        //    map：使用纹理贴图
+        var material = new THREE.MeshBasicMaterial({
+          color: 0xffff00,
+          opacity: 0.75
+        }); 
+        
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(5, 5, 5), material);
+        scene.add(cube);
+        
+        // 渲染
+        renderer.render(scene, camera);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
