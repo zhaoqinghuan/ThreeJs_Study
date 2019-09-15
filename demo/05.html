@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 文字形状</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script type="text/javascript">
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        var renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        var scene = new THREE.Scene();
+        
+        //  相机（camera）
+        var camera = new THREE.OrthographicCamera(-2.5, 2.5, 1.875, -1.875, 0.1, 100);
+        camera.position.set(5, 5, 20);
+        camera.lookAt(new THREE.Vector3(1, 0, 0));
+        scene.add(camera);
+        
+        //  调用方法绘制坐标轴
+        drawAxes(scene);
+
+        //  将设置设置材质属性单独提取出来
+        var material = new THREE.MeshBasicMaterial({
+          color: 0xffff00,
+          wireframe: true
+        });
+
+        //  声明灯光属性
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(-5, 10, 5);
+        scene.add(light);
+
+        //  声明字体加载类
+        var loader = new THREE.FontLoader();
+        loader.load('../build/fonts/helvetiker_regular.typeface.json', function(font) {
+          //  THREE.TextGeometry(text, parameters)
+          //    text是文字字符串，parameters是以下参数组成的对象
+          //    size：字号大小，一般为大写字母的高度
+          //    height：文字的厚度
+          //    curveSegments：弧线分段数，使得文字的曲线更加光滑
+          //    font：字体，默认是'helvetiker'，需对应引用的字体文件
+          //    weight：值为'normal'或'bold'，表示是否加粗
+          //    style：值为'normal'或'italics'，表示是否斜体
+          //    bevelEnabled：布尔值，是否使用倒角，意为在边缘处斜切
+          //    bevelThickness：倒角厚度
+          //    bevelSize：倒角宽度
+          var mesh = new THREE.Mesh(new THREE.TextGeometry('Hello', {
+              font: font,
+              size: 1,
+              height: 1
+          }), material);
+          scene.add(mesh);
+          
+          //  渲染
+          renderer.render(scene, camera);
+        });
+      }
+      
+      //   绘制平面直角坐标系
+      function drawAxes(scene) {
+        // x-axis
+        var xGeo = new THREE.Geometry();
+        xGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        xGeo.vertices.push(new THREE.Vector3(1, 0, 0));
+        var xMat = new THREE.LineBasicMaterial({
+          color: 0xff0000
+        });
+        var xAxis = new THREE.Line(xGeo, xMat);
+        scene.add(xAxis);
+        
+        // y-axis
+        var yGeo = new THREE.Geometry();
+        yGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        yGeo.vertices.push(new THREE.Vector3(0, 1, 0));
+        var yMat = new THREE.LineBasicMaterial({
+          color: 0x00ff00
+        });
+        var yAxis = new THREE.Line(yGeo, yMat);
+        scene.add(yAxis);
+        
+        // z-axis
+        var zGeo = new THREE.Geometry();
+        zGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+        zGeo.vertices.push(new THREE.Vector3(0, 0, 1));
+        var zMat = new THREE.LineBasicMaterial({
+          color: 0x00ccff
+        });
+        var zAxis = new THREE.Line(zGeo, zMat);
+        scene.add(zAxis);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
