@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Three.js 基础材质</title>
+    <title>Three.js Lambert 材质</title>
     <script type="text/javascript" src="../build/three.js"></script>
     
     <script type="text/javascript">
@@ -28,17 +28,14 @@
         light.position.set(10, 15, 5);
         scene.add(light);
 
-        //  基本材质
-        //  THREE.MeshBasicMaterial(opt)
-        //    opt可以缺省，或者为包含各属性的值 常见的 opt 值如下
-        //    visible：是否可见，默认为true
-        //    side：渲染面片正面或是反面，默认为正面THREE.FrontSide，可设置为反面THREE.BackSide，或双面THREE.DoubleSide
-        //    wireframe：是否渲染线而非面，默认为false
-        //    color：十六进制RGB颜色，如红色表示为0xff0000
-        //    map：使用纹理贴图
-        var material = new THREE.MeshBasicMaterial({
-          color: 0xffff00,
-          opacity: 0.75
+        //  Lambert 材质
+        //  THREE.MeshLambertMaterial(opt)
+        //    color是用来表现材质对散射光的反射能力，也是最常用来设置材质颜色的属性。除此之外，还可以用ambient和emissive控制材质的颜色
+        //    ambient表示对环境光的反射能力，只有当设置了AmbientLight后，该值才是有效的，材质对环境光的反射能力与环境光强相乘后得到材质实际表现的颜色。
+        //    emissive是材质的自发光颜色，可以用来表现光源的颜色。
+        var material = new THREE.MeshLambertMaterial({
+          color: 0xffff00, // 黄色的散射光
+          emissive: 0xff0000 // 红色的自发光
         }); 
         
         var cube = new THREE.Mesh(new THREE.CubeGeometry(5, 5, 5), material);
