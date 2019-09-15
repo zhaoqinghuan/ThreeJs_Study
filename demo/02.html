@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 正交摄影机</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script type="text/javascript">
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        var renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+        
+        //  如果想要在 html 中生成 Canvas 元素可以这样进行定义
+        //  var renderer = new THREE.WebGLRenderer();
+        //  renderer.setSize(400, 300);
+        //  document.getElementsByTagName('body')[0].appendChild(renderer.domElement);
+                
+        //  场景（Scene）
+        var scene = new THREE.Scene();
+        
+        //  相机（camera）
+        //  THREE.OrthographicCamera(left, right, top, bottom, near, far)
+        var camera = new THREE.OrthographicCamera(-2, 2, 1.5, -1.5, 1, 10); //  基本正交投影的正方形
+        var camera = new THREE.OrthographicCamera(-1, 1, 1.5, -1.5, 1, 10); //  水平方向拉长的正方形
+
+        camera.position.set(0, 0, 5); // 相机初始位置
+        camera.position.set(1, 0, 5); // 相机向右移动一个单位（物体向左因为位置是相对的）
+        var camera = new THREE.OrthographicCamera(-1, 3, 1.5, -1.5, 1, 10); //  将物体位置设置的更靠右侧
+        camera.position.set(0, 0, 5); // 相机位置放在原位置（等价于上面相机向右移动一个单位）
+        camera.position.set(4, -3, 5); // 设置相机角度向上仰望 （相机换个角度）此时现在照相机沿z轴负方向观察的，因此观察不到正方体，只看到一片黑。我们可以通过lookAt函数指定它看着原点方向
+        camera.lookAt(new THREE.Vector3(0, 0, 0)); // lookAt函数接受的是一个THREE.Vector3的实例，因此千万别写成camera.lookAt(0, 0, 0)，否则非但不能得到理想的效果，而且不会报错，使你很难找到问题所在。
+        scene.add(camera);
+        
+        // 在场景中添加一个长方形 （x=1,y=2,z=3）
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({ //  设置材质
+            color: 0xff0000,
+            wireframe: true
+          })
+        );
+        scene.add(cube);
+        
+        // 渲染
+        renderer.render(scene, camera);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
