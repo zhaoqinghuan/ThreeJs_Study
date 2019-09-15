@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 透视投影照相机</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script type="text/javascript">
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        var renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        var scene = new THREE.Scene();
+        
+        //  相机（camera）
+        //  透视投影照相机 THREE.PerspectiveCamera(fov, aspect, near, far)
+        //    fov是视景体竖直方向上的张角（是角度制而非弧度制）
+        //    aspect等于width / height，是照相机水平方向和竖直方向长度的比值
+        //    near和far分别是照相机到视景体最近、最远的距离，均为正值，且far应大于near
+        var camera = new THREE.PerspectiveCamera(45, 400 / 300, 1, 10);
+        var camera = new THREE.PerspectiveCamera(60, 400 / 300, 1, 10); // 修改仰角 fov 为60 竖直张角
+        //  此时发现正方体显得更小了呢？我们从下面的侧视图来看，虽然正方体的实际大小并未改变，但是将照相机的竖直张角设置得更大时，视景体变大了，因而正方体相对于整个视景体的大小就变小了，看起来正方形就显得变小了。
+
+        camera.position.set(0, 0, 5);
+        scene.add(camera);
+        
+        // 在场景中添加一个长方形 （x=1,y=2,z=3）
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1),
+          new THREE.MeshBasicMaterial({ //  设置材质
+            color: 0xff0000,
+            wireframe: true
+          })
+        );
+        scene.add(cube);
+        
+        // 渲染
+        renderer.render(scene, camera);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
