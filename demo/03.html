@@ -25,7 +25,6 @@
         var camera = new THREE.PerspectiveCamera(45, 400 / 300, 1, 10);
         var camera = new THREE.PerspectiveCamera(60, 400 / 300, 1, 10); // 修改仰角 fov 为60 竖直张角
         //  此时发现正方体显得更小了呢？我们从下面的侧视图来看，虽然正方体的实际大小并未改变，但是将照相机的竖直张角设置得更大时，视景体变大了，因而正方体相对于整个视景体的大小就变小了，看起来正方形就显得变小了。
-
         camera.position.set(0, 0, 5);
         scene.add(camera);
         
