@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js Mesh 网格</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script type="text/javascript">
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        var renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        var scene = new THREE.Scene();
+        
+        //  相机（camera）
+        var camera = new THREE.OrthographicCamera(-2.5, 2.5, 1.875, -1.875, 0.1, 100);
+        camera.position.set(5, 5, 20);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(20, 10, 5);
+        scene.add(light);
+
+        //  网格（Mesh）
+        //  Mesh(geometry, material)
+        var mesh = new THREE.Mesh(new THREE.CubeGeometry(1, 2, 3), 
+          new THREE.MeshLambertMaterial({ // 为网格设置材质
+            color: 0xffff00
+          })
+        );
+        
+        //  材质重设置
+        mesh.material = new THREE.MeshLambertMaterial({
+          color: 0xff0000
+        });
+
+        //  对 mesh 的 scale、rotation、position 分别进行设置 分别代表 缩放 旋转 位置
+        //  这里以修改位置的方法为例，其它的方法都是一样的。
+        mesh.position.z = 1; // 修改位置为 z =1 position 有 x、y、z 三个属性分别代表 X轴 Y轴 Z轴。
+        mesh.position.set(1.5, -0.5, 0); // 也可以通过这种方法直接修改
+        scene.add(mesh);
+
+        //  重新设置材质
+        
+        // 渲染
+        renderer.render(scene, camera);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
