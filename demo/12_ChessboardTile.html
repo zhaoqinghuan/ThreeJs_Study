@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Three.js mapTexture 贴图材质</title>
+    <title>Three.js 平铺贴图材质</title>
     <script type="text/javascript" src="../build/three.js"></script>
     
     <script type="text/javascript">
@@ -19,42 +19,33 @@
         
         //  相机（camera）
         var camera = new THREE.OrthographicCamera(-10, 10, 7.5, -7.5, 0.1, 100);
-                camera.position.set(25, 25, 25);
-                camera.lookAt(new THREE.Vector3(0, 0, 0));
-                scene.add(camera);
+        camera.position.set(0, 0, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
         
         //  添加光源
         var light = new THREE.PointLight(0xffffff, 1, 1000);
-                light.position.set(10, 15, 20);
-                scene.add(light);
+        light.position.set(10, 15, 20);
+        scene.add(light);
 
         //  mapTexture 贴图材质
         //  THREE.MeshLambertMaterial() map参数
 
         //  将图片导入纹理
-		    //	https://raw.githubusercontent.com/zhaoqinghuan/Images/master/20190916101246.png
-        var texture = THREE.ImageUtils.loadTexture('http://localhost/build/img/01YdRBbTLpi6.png', {}, function() {
+        var texture = THREE.ImageUtils.loadTexture('../img/chess.png', {}, function() {
           renderer.render(scene, camera);
         });
 
-        //  单个图片贴单个模型
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping; //  指定重复方式为两个方向（wrapS和wrapT）都重复
+        texture.repeat.set(4, 4); //  设置两个方向上都重复4次，由于我们的图像本来是有2行2列，所以重复4次即为8行8列
+
+        //  进行贴图
         var material = new THREE.MeshLambertMaterial({
           map: texture
         });
-        
-        //  多个图片贴一个模型
-        // var materials = [];
-        // for (var i = 0; i < 6; ++i) { //  贴图文件命名用 1-6 表示
-        //   materials.push(new THREE.MeshBasicMaterial({
-        //     map: THREE.ImageUtils.loadTexture('../img/' + i + '.png',{}, function() {
-        //       renderer.render(scene, camera);
-        //     }),
-        //     overdraw: true
-        //   }));
-        // }
 
-        var cube = new THREE.Mesh(new THREE.CubeGeometry(5, 5, 5), material); // 矩形
-        scene.add(cube);
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), material); // 生成平面
+        scene.add(plane);
         
         // 渲染
         renderer.render(scene, camera);
