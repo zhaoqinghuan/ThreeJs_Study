@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 记录 完整动画示例</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    <script type="text/javascript" src="../build/stat.js"></script>
+    
+    <script>
+      //  requestAnimationFrame 匹配各种浏览器的兼容
+      var requestAnimationFrame = window.requestAnimationFrame 
+          || window.mozRequestAnimationFrame
+          || window.webkitRequestAnimationFrame
+          || window.msRequestAnimationFrame;
+      window.requestAnimationFrame = requestAnimationFrame;
+      //  将相关变量定义在方法外，以供全局使用
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+
+      var id = null;
+
+      var stat = null;
+
+      var ballMesh = null; // 弹球位置
+      var ballRadius = 0.5; //  弹球半径
+      var isMoving = false; //  弹球从高度为maxHeight处自由下落，掉落到平面上时会反弹，并且速度有损耗。当速度很小的时候，弹球会在平面上作振幅微小的抖动，所以，当速度足够小时，我们需要让弹球停止跳动。
+      var maxHeight = 5;
+
+      var v = 0;
+      var a = -0.01; // a = -0.1代表每帧小球向y方向负方向移动0.1个单位。
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  Stat 初始化 用于记录 FPX 的类库
+        stat = new Stats();
+        stat.domElement.style.position = 'absolute';
+        stat.domElement.style.right = '0px';
+        stat.domElement.style.top = '0px';
+        document.body.appendChild(stat.domElement);
+
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(5, 10, 20);
+        camera.lookAt(new THREE.Vector3(0, 3, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(10, 10, 15);
+        scene.add(light);
+
+        //  声明球
+        ballMesh = new THREE.Mesh(new THREE.SphereGeometry(ballRadius, 16, 8), 
+          new THREE.MeshLambertMaterial({
+            color: 0xffff00
+          })
+        );
+        ballMesh.position.y = ballRadius;
+        scene.add(ballMesh);
+        
+        //  声明棋盘
+        var texture = THREE.ImageUtils.loadTexture('http://localhost/build/img/01YdRC86nAUx.png', {}, function() {
+          renderer.render(scene, camera);
+        });
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(4, 4);
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5),
+        new THREE.MeshLambertMaterial({map: texture}));
+        plane.rotation.x = -Math.PI / 2;
+        scene.add(plane);
+
+        //  动画执行函数
+        //  requestAnimationFrame(func)
+        //    func 即动画函数本身
+        id = requestAnimationFrame(draw);
+      }
+
+      //  动画函数本身
+      //    每20毫秒就会调用一次draw函数，改变长方体的旋转值，然后进行重绘。最终得到的效果就是FPS为50的旋转长方体
+      function draw() {
+        stat.begin(); // 记录动画开始时的 FPX
+        
+        if (isMoving) {
+          ballMesh.position.y += v;
+          v += a;
+
+          if (ballMesh.position.y <= ballRadius) {
+            // hit plane
+            v = -v * 0.9;
+          }
+          
+          if (Math.abs(v) < 0.001) {
+            // stop moving
+            isMoving = false;
+            ballMesh.position.y = ballRadius;
+          }
+        }
+        renderer.render(scene, camera);
+        id = requestAnimationFrame(draw);
+
+        stat.end();// 记录结束时的 FPX
+      }
+
+      //  动画停止函数，直接给 id 值清空掉
+      function stop() {
+        if (id !== null) {
+          cancelAnimationFrame(id); 
+          id = null;
+        }
+      }
+      //  点击按钮时，弹球从最高处下落
+      function drop() {
+        isMoving = true;
+        ballMesh.position.y = maxHeight;
+        v = 0;
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+      <br><br><br>
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+    <!-- 动画的停止按钮 -->
+    <br>
+    <button id="dropBtn" onclick="drop()">Drop</button>
+  </body>
+</html>
