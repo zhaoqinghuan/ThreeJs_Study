@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Three.js setInterval</title>
+    <title>Three.js requestAnimationFrame</title>
     <script type="text/javascript" src="../build/three.js"></script>
     
     <script>
+      // setInterval方法与requestAnimationFrame方法的区别较为微妙。
+      // 一方面，最明显的差别表现在setInterval可以手动设定FPS，而requestAnimationFrame则会自动设定FPS；
+      // 但另一方面，即使是setInterval也不能保证按照给定的FPS执行，在浏览器处理繁忙时，很可能低于设定值。
+      // 当浏览器达不到设定的调用周期时，requestAnimationFrame采用跳过某些帧的方式来表现动画，
+      // 虽然会有卡滞的效果但是整体速度不会拖慢，而setInterval会因此使整个程序放慢运行，但是每一帧都会绘制出来； 
+      // 总而言之，requestAnimationFrame适用于对于时间较为敏感的环境（但是动画逻辑更加复杂），
+      // 而setInterval则可在保证程序的运算不至于导致延迟的情况下提供更加简洁的逻辑（无需自行处理时间）。
+
+      //  requestAnimationFrame 匹配各种浏览器的兼容
+      var requestAnimationFrame = window.requestAnimationFrame 
+          || window.mozRequestAnimationFrame
+          || window.webkitRequestAnimationFrame
+          || window.msRequestAnimationFrame;
+      window.requestAnimationFrame = requestAnimationFrame;
       //  将相关变量定义在方法外，以供全局使用
       var scene = null;
       var camera = null;
@@ -45,24 +59,24 @@
         scene.add(mesh);
         
         //  动画执行函数
-        //  setInterval(func, msec)
-        //    func是每过msec毫秒执行的函数，如果将func定义为重绘画面的函数，就能实现动画效果
-        //    setInterval函数返回一个id，如果需要停止重绘，需要使用clearInterval方法，并传入该id
-        //    因此在当前例子中 我们把 id 做为全局变量进行临时存储
-        id = setInterval(draw, 20);
+        //  requestAnimationFrame(func)
+        //    func 即动画函数本身
+        id = requestAnimationFrame(draw);
       }
 
       //  动画函数本身
       //    每20毫秒就会调用一次draw函数，改变长方体的旋转值，然后进行重绘。最终得到的效果就是FPS为50的旋转长方体
       function draw() {
-        mesh.rotation.y = (mesh.rotation.y + 0.01) % (Math.PI * 2); //  首先设定在每帧中的变化，让场景中的长方体绕y轴转动
-        renderer.render(scene, camera); //  实时渲染 
+        mesh.rotation.y = (mesh.rotation.y + 0.01) % (Math.PI * 2);
+        renderer.render(scene, camera);
+        //  由于requestAnimationFrame只请求一帧画面，因此，除了在init函数中需要调用，在被其调用的函数中需要再次调用 requestAnimationFrame
+        id = requestAnimationFrame(draw);
       }
 
       //  动画停止函数，直接给 id 值清空掉
       function stop() {
         if (id !== null) {
-          clearInterval(id);
+          cancelAnimationFrame(id); 
           id = null;
         }
       }
@@ -73,6 +87,7 @@
     <!-- WebGL 必须使用 Canvas 标签来渲染 -->
     <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
     <!-- 动画的停止按钮 -->
+    <br>
     <button id="stopBtn" onclick="stop()">Stop</button> 
   </body>
 </html>
