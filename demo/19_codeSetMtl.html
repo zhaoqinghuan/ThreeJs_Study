@@ -43,7 +43,10 @@
           loader.load('../build/obj/port.obj', function(obj) {
             obj.traverse(function(child) {
               if (child instanceof THREE.Mesh) {
-                child.material.side = THREE.DoubleSide;
+                child.material = new THREE.MeshLambertMaterial({
+                  color: 0xffff00,  //  在代码中为模型添加材质 单纯加颜色
+                  side: THREE.DoubleSide
+                });
               }
             });
           
