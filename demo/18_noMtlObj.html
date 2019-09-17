@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js Obj 无贴图模型加载</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    <!-- 引入 Obj 格式的模型的类加载文件 -->
+    <script type="text/javascript" src="../build/OBJLoader.js"></script>
+    
+    <script>
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+      
+      var mesh = null;
+      var id = null;
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(15, 25, 25);
+        camera.lookAt(new THREE.Vector3(0, 2, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(20, 10, 5);
+        scene.add(light);
+
+        //  模型加载
+        var loader = new THREE.OBJLoader();
+          loader.load('../lib/port.obj', function(obj) {
+            obj.traverse(function(child) {
+              if (child instanceof THREE.Mesh) {
+                child.material.side = THREE.DoubleSide;
+              }
+            });
+          
+          mesh = obj;
+          scene.add(obj);
+        });
+
+        
+      }
+
+      //  动画函数本身
+      function draw() {
+        renderer.render(scene, camera);
+        
+        mesh.rotation.y += 0.01;
+        if (mesh.rotation.y > Math.PI * 2) {
+          mesh.rotation.y -= Math.PI * 2;
+        }
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
