@@ -42,14 +42,14 @@
 
         //  贴图加载
         var mtlLoader = new THREE.MTLLoader();
-        mtlLoader.setPath('../build/');
-        mtlLoader.load('obj/port.mtl', function(materials) {
+        mtlLoader.setPath('../build/obj/');
+        mtlLoader.load('FL.mtl', function(materials) {
           materials.preload();
           // 模型加载
           var objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.setPath('../build/');
-            objLoader.load('obj/port.obj', function ( object ) {
+            objLoader.setPath('../build/obj/');
+            objLoader.load('FL.obj', function ( object ) {
               object.position.y = - 95;
               // if has object, add to scene
               if (object.children.length > 0) {
