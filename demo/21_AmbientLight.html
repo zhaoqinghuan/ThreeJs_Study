@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js AmbientLight</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script>
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer({
+          //  将 Renderer 和 Canvas 元素进行绑定，提前在 HTML 中手动定义了 id 为 mainCanvas 的 Canvas 元素
+          canvas: document.getElementById('mainCanvas')
+        });
+        renderer.setClearColor(0x000000); //  对背景进行着色
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+		    camera.position.set(5, 15, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        //  THREE.AmbientLight(hex)
+        //    其中，hex是十六进制的RGB颜色信息，如红色表示为0xff0000。            
+        var light = new THREE.AmbientLight(0xcccccc); // 稍微暗些的环境光
+        var light = new THREE.AmbientLight(0xffffff); // 高亮环境光
+        scene.add(light);
+
+        //  
+        var greenCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), 
+          new THREE.MeshLambertMaterial({color: 0x00ff00}));
+        greenCube.position.x = 3;
+        scene.add(greenCube);
+
+        var whiteCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
+          new THREE.MeshLambertMaterial({color: 0xffffff}));
+        whiteCube.position.x = -3;
+        scene.add(whiteCube);
+
+        renderer.render(scene, camera);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="900px" height="800px" ></canvas>
+  </body>
+</html>
