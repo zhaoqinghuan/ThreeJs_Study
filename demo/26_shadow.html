@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js shadow 阴影</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script>
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+
+      var cube = null;
+      var alpha = 0;
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(400, 300); //  设置渲染器的尺寸
+        
+        var container = document.getElementById('canvas');
+        container.appendChild(renderer.domElement); //  绑定渲染器到 Canvas
+        renderer.shadowMapEnabled = true; //  渲染阴影
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(5, 15, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  生成平面
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 16, 16),
+                    new THREE.MeshLambertMaterial({color: 0xcccccc}));
+          plane.rotation.x = -Math.PI / 2;
+          plane.position.y = -1;
+          plane.receiveShadow = true; //  对于接收阴影的物体调用
+        scene.add(plane);
+
+        //  生成一个正方体
+        cube =  new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1),
+                new THREE.MeshLambertMaterial({color: 0x00ff00}));
+          cube.position.x = 2;
+          cube.castShadow = true; //  对要产生阴影的物体调用生成阴影
+        scene.add(cube);
+        
+        //  添加光源
+        var light = new THREE.SpotLight(0xffff00, 1, 100, Math.PI / 6, 25);
+          light.position.set(2, 5, 3);
+          light.target = cube;
+          light.castShadow = true;  //  对光源调用生成阴影
+        scene.add(light);
+        
+
+        var ambient = new THREE.AmbientLight(0x666666);
+          scene.add(ambient);
+
+        //  调用动画
+        requestAnimationFrame(draw);
+      }
+
+      //  定义动画
+      function draw() {
+        alpha += 0.01;
+        if (alpha > Math.PI * 2) {
+          alpha -= Math.PI * 2;
+        }
+        cube.position.set(2 * Math.cos(alpha), 0, 2 * Math.sin(alpha));   
+        renderer.render(scene, camera);
+        requestAnimationFrame(draw);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <div id="canvas" width="400px" height="300px"></div>
+  </body>
+</html>
