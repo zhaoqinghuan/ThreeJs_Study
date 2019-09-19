@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js 分布式着色器</title>
+    <!-- 引入 Jquery 因为要使用 Get 函数来引入片元着色器和顶点着色器  -->
+    <script type="text/javascript" src="../build/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="../build/three.js"></script>
+    <script>
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+            
+      var material = null;
+      var cube = null;
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer({
+          canvas: document.getElementById('mainCanvas')
+        });
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(5, 15, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  添加光源
+        var light = new THREE.DirectionalLight();
+        light.position.set(3, 2, 5);
+        scene.add(light);
+        
+        //  使用 Get 函数来引入片元着色器和顶点着色器 vShader 与 fShader 分别为导入的着色器程序，用来构造着色器材质。
+        $.get('shader/my.vs', function(vShader){
+          $.get('shader/my.fs', function(fShader){
+            //  新建一个THREE.ShaderMaterial，需要传入属性vertexShader与fragmentShader
+            material = new THREE.ShaderMaterial({
+              vertexShader: vShader,
+              fragmentShader: fShader
+            });
+            //  生成一个几何体    
+            cube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), material);
+            scene.add(cube);
+
+            //  调用动画   
+            draw();
+          });
+        });
+      }
+
+      //  定义动画
+      function draw() {
+        cube.rotation.y += 0.01;
+        if (cube.rotation.y > Math.PI * 2) {
+          cube.rotation.y -= Math.PI * 2;
+        }
+        cube.position.set(2 * Math.cos(alpha), 0, 2 * Math.sin(alpha));   
+        renderer.render(scene, camera);
+        requestAnimationFrame(draw);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <canvas id="mainCanvas" width="400px" height="300px" ></canvas>
+  </body>
+</html>
