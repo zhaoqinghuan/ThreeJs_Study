@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Three.js AmbientLight</title>
+    <title>Three.js RedAmbientLight</title>
     <script type="text/javascript" src="../build/three.js"></script>
     
     <script>
@@ -17,7 +17,7 @@
           canvas: document.getElementById('mainCanvas')
         });
         renderer.setClearColor(0x000000); //  对背景进行着色
-                
+        
         //  场景（Scene）
         scene = new THREE.Scene();
         
@@ -29,19 +29,24 @@
         
         //  添加光源
         //  THREE.AmbientLight(hex)
-        //    其中，hex是十六进制的RGB颜色信息，如红色表示为0xff0000。            
-        var light = new THREE.AmbientLight(0xcccccc); // 稍微暗些的环境光
-        //var light = new THREE.AmbientLight(0xffffff); // 高亮环境光
+        //    其中，hex是十六进制的RGB颜色信息，如红色表示为 0xff0000         
+        //  var light = new THREE.AmbientLight(0xffffff); // 设置环境光源为基本白色
+        var light = new THREE.AmbientLight(0xff0000); // 变更环境光源为红色
         scene.add(light);
-
-        //  
-        var greenCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2), 
-          new THREE.MeshLambertMaterial({color: 0x00ff00}));
+        
+        var greenCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
+          //  修改模型的贴图特质 color 为 ambient。 因为环境光并不在乎物体材质的 color 属性而是 ambient 属性
+          //    ambient 属性表示的是物体反射环境光的能力对于0x00ff00的物体，
+          //    对于 0x00ff00 的物体，红色通道是0，而环境光是完全的红光，因此该长方体不能反射任何光线，最终的渲染颜色就是黑色；
+          //    而对于 0xffffff 的白色长方体，红色通道是0xff，因而能反射所有红光，渲染的颜色就是红色。
+            new THREE.MeshLambertMaterial({color: 0x00ff00}));
+          //new THREE.MeshLambertMaterial({ambient: 0x00ff00}));
         greenCube.position.x = 3;
         scene.add(greenCube);
 
         var whiteCube = new THREE.Mesh(new THREE.CubeGeometry(2, 2, 2),
-          new THREE.MeshLambertMaterial({color: 0xffffff}));
+            new THREE.MeshLambertMaterial({color: 0xffffff}));
+          //  new THREE.MeshLambertMaterial({ambient: 0xffffff})); //   当这个物体的 ambient 属性是 0xffffff
         whiteCube.position.x = -3;
         scene.add(whiteCube);
 
