@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three.js SpotLight 聚光灯</title>
+    <script type="text/javascript" src="../build/three.js"></script>
+    
+    <script>
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+
+      var cube = null;
+      var alpha = 0;
+
+      //  init 函数，在HTML加载完后执行
+      function init() {
+        //  渲染器（Renderer）
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(400, 300); //  设置渲染器的尺寸
+        
+        var container = document.getElementById('canvas');
+        container.appendChild(renderer.domElement); //  绑定渲染器到 Canvas
+        renderer.shadowMapEnabled = true; //  开启阴影
+                
+        //  场景（Scene）
+        scene = new THREE.Scene();
+        
+        //  相机（camera）
+        camera = new THREE.OrthographicCamera(-5, 5, 3.75, -3.75, 0.1, 100);
+        camera.position.set(5, 15, 25);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+        
+        //  生成平面
+        var plane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 16, 16),
+                    new THREE.MeshLambertMaterial({color: 0xcccccc}));
+          plane.rotation.x = -Math.PI / 2;
+          plane.position.y = -1;
+          plane.receiveShadow = true;
+        scene.add(plane);
+
+        //  生成一个正方体
+        cube =  new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1),
+                new THREE.MeshLambertMaterial({color: 0x00ff00}));
+          cube.position.x = 2;
+          cube.castShadow = true;
+        scene.add(cube);
+        
+        //  添加光源
+        //  THREE.SpotLight(hex, intensity, distance, angle, exponent)
+        //    聚光灯是一种特殊的点光源，它能够朝着一个方向投射光线。
+        //    聚光灯投射出的是类似圆锥形的光线，这与我们现实中看到的聚光灯是一致的。
+        //      hex是光源十六进制的颜色值; 
+        //      intensity是亮度，缺省值为1，表示100%亮度;
+        //      angle是聚光灯的张角，缺省值是Math.PI / 3，最大值是Math.PI / 2;
+        //      exponent是光强在偏离target的衰减指数（target需要在之后定义，缺省值为(0, 0, 0)），缺省值是10。
+        //      distance是光源最远照射到的距离，缺省值为0.
+        var light = new THREE.SpotLight(0xffff00, 1, 100, Math.PI / 6, 25);
+          //  这里设置光源位置并不意味着所有光从(2, 5, 3)点射出（如果是的话，就成了点光源），
+          //  而是意味着，平行光将以矢量(-2, -5, -3)的方向照射到所有平面。
+          //  因此，平面亮度与平面的位置无关，而只与平面的法向量相关。只要平面是平行的，那么得到的光照也一定是相同的。
+          light.position.set(2, 5, 3);
+          light.target = cube;
+          light.castShadow = true;
+        scene.add(light);
+        
+
+        var ambient = new THREE.AmbientLight(0x666666);
+          scene.add(ambient);
+
+        //  调用动画
+        requestAnimationFrame(draw);
+      }
+
+      //  定义动画
+      function draw() {
+        alpha += 0.01;
+        if (alpha > Math.PI * 2) {
+          alpha -= Math.PI * 2;
+        }
+        cube.position.set(2 * Math.cos(alpha), 0, 2 * Math.sin(alpha));   
+        renderer.render(scene, camera);
+        requestAnimationFrame(draw);
+      }
+    </script>
+  </head>
+  
+  <body onload="init()">
+    <!-- WebGL 必须使用 Canvas 标签来渲染 -->
+    <div id="canvas" width="400px" height="300px"></div>
+  </body>
+</html>
